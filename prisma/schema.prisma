@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://video_92kh_user:bPFRevN6FViFu73769DhrsCr8JfU0TfU@dpg-cu80lflumphs73edq1i0-a.oregon-postgres.render.com/video_92kh"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  isBlocked     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  lastLoginAt   DateTime?
+  loginAttempts Int       @default(0)
+  videos        Video[]
+  auditLogs     AuditLog[]
+  reports       Report[]  @relation("ReportedBy")
+  reportedIn    Report[]  @relation("ReportedUser")
+  analytics     UserAnalytics?
+
+  @@map("users")
+}
+
+model Video {
+  id           String    @id @default(uuid())
+  title        String
+  url          String
+  thumbnailUrl String?
+  description  String?
+  isPublished  Boolean   @default(true)
+  views        Int       @default(0)
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  auditLogs    AuditLog[]
+  reports      Report[]
+  analytics    VideoAnalytics?
+
+  @@map("videos")
+}
+
+model UserAnalytics {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalVideoViews   Int      @default(0)
+  totalVideos       Int      @default(0)
+  lastActive        DateTime @default(now())
+  deviceStats       Json?    
+  browserStats      Json?    
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("user_analytics")
+}
+
+model VideoAnalytics {
+  id              String   @id @default(uuid())
+  videoId         String   @unique
+  video           Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  totalViews      Int      @default(0)
+  uniqueViews     Int      @default(0)
+  averageWatchTime Float   @default(0)
+  deviceStats     Json?    
+  browserStats    Json?    
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("video_analytics")
+}
+
+model Report {
+  id          String    @id @default(uuid())
+  type        ReportType
+  reason      String
+  description String?
+  status      ReportStatus @default(PENDING)
+  reportedBy  User      @relation("ReportedBy", fields: [reporterId], references: [id])
+  reporterId  String
+  video       Video?    @relation(fields: [videoId], references: [id])
+  videoId     String?
+  user        User?     @relation("ReportedUser", fields: [userId], references: [id])
+  userId      String?
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+  resolution  String?
+
+  @@map("reports")
+}
+
+model AuditLog {
+  id        String    @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  metadata  Json?
+  createdAt DateTime  @default(now())
+  video     Video?    @relation(fields: [videoId], references: [id])
+  videoId   String?
+  ipAddress String?
+  userAgent String?
+
+  @@map("audit_logs")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ReportType {
+  VIDEO
+  USER
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  REJECTED
+}
