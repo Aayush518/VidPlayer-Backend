@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "outDir": "./dist", // Specify the output directory for compiled files
+      "module": "commonjs",
+      "target": "es2019",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true
+    },
+    "include": ["server/**/*"],
+    "exclude": ["node_modules"]
+  }
