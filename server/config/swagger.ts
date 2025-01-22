@@ -69,7 +69,7 @@ All endpoints may return these error responses:
     },
     servers: [
       {
-        url: 'http://localhost:5001',
+        url: 'https://vidplayer-backend.onrender.com',
         description: 'Development server',
       },
       {
