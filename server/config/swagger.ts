@@ -72,6 +72,10 @@ All endpoints may return these error responses:
         url: 'http://localhost:5001',
         description: 'Development server',
       },
+      {
+        url: 'https://vidplayer-backend.onrender.com',
+        description: 'Production server',
+      },
     ],
     components: {
       securitySchemes: {
