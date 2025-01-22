@@ -1,3 +1,31 @@
+// import express from 'express';
+// import cors from 'cors';
+// import dotenv from 'dotenv';
+// import swaggerUi from 'swagger-ui-express';
+// import { userRouter } from './routes/user.routes';
+// import { videoRouter } from './routes/video.routes';
+// import { authRouter } from './routes/auth.routes';
+// import { adminRouter } from './routes/admin.routes';
+// import { errorHandler } from './middleware/error';
+// import { authenticate } from './middleware/auth';
+// import { configureSecurityMiddleware } from './middleware/security';
+// import { specs } from './config/swagger';
+
+// dotenv.config();
+
+// const app = express();
+// const port = 5001;
+
+// // Security middleware
+// configureSecurityMiddleware(app);
+
+// // Basic middleware
+// app.use(cors());
+// app.use(express.json());
+
+// export default app;
+
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -16,12 +44,20 @@ dotenv.config();
 const app = express();
 const port = 5001;
 
+// CORS configuration
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow only our frontend origin
+  credentials: true, // Allow credentials
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Basic middleware
+app.use(express.json());
+
 // Security middleware
 configureSecurityMiddleware(app);
 
-// Basic middleware
-app.use(cors());
-app.use(express.json());
 
 // Enhanced Swagger UI options with better styling and features
 const swaggerOptions = {
@@ -170,5 +206,7 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
   console.log(`API Documentation available at http://localhost:${port}/api-docs`);
 });
+
+
 
 export default app;
